@@ -13,7 +13,7 @@ public class chatbot {
         try {
             // Connect to the database
             Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://localhost/chatbot3";
+            String url = "jdbc:mysql://172.17.0.2/chatbot3";
             String username = "root";
             String password = "Vijay@123";
             conn = DriverManager.getConnection(url, username, password);
