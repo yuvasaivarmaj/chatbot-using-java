@@ -1,9 +1,16 @@
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class chatbot {
     private Connection conn;
@@ -13,15 +20,37 @@ public class chatbot {
         try {
             // Connect to the database
             Class.forName("com.mysql.cj.jdbc.Driver");
-            String url = "jdbc:mysql://localhost/chatbot3";
-            String username = "root";
-            String password = "Vijay@123";
+            String url = "jdbc:mysql://mysql/chat_database"; // "mysql" instead of "localhost"
+            String username = "chat_user";
+            String password = "chat_password";
             conn = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
             System.out.println("Error connecting to database: " + e.getMessage());
         }
     }
+    
+    public void startServer() {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
+            server.createContext("/", new ChatHandler());
+            server.setExecutor(null); // creates a default executor
+            server.start();
+            System.out.println("Server is listening on port 80...");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    static class ChatHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = "This is the response from the chatbot server";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
     public void login() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Do you have an account? (yes/no): ");
@@ -162,12 +191,7 @@ public class chatbot {
 
     public static void main(String[] args) {
         chatbot chatbot = new chatbot();
+        chatbot.startServer();
         chatbot.login();
-
-        // Create a new instance of the ChatbotGUI class
-        chatbotgui gui = new chatbotgui();
-
-        // Show the GUI
-        gui.setVisible(true);
     }
 }

@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  server:
+    build: 
+      context: ./
+      dockerfile: java.dockerfile
+    volumes:
+      - /Users/yuvasaivarmajampana/Documents/gitdemo/chatbot-using-java/chatbot-using-java:/app
+    depends_on:
+      - mysql
+    networks:
+      - chat-network
+    ports:
+      - 80:80
+  mysql:
+    build:
+      context: ./
+      dockerfile: mysql.dockerfile
+    ports:
+      - "3306:3306"
+    networks:
+      - chat-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./chatbot.sql:/docker-entrypoint-initdb.d/chatbot.sql
+
+
+networks:
+  chat-network:
+volumes:
+  mysql-data:
